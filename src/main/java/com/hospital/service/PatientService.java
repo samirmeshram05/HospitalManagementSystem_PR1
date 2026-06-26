@@ -1,6 +1,6 @@
 package com.hospital.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import com.hospital.entity.Patient;
 
@@ -8,7 +8,8 @@ public interface PatientService {
 
     Patient savePatient(Patient patient);
 
-    List<Patient> getAllPatients();
+    //List<Patient> getAllPatients();
+    Page<Patient> getAllPatients(int page,int size);
 
     Patient getPatientById(Long id);
 

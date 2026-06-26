@@ -3,6 +3,7 @@ package com.hospital.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.hospital.entity.Department;
@@ -89,6 +90,18 @@ public class DoctorServiceImpl implements DoctorService {
                         new ResourceNotFoundException("Doctor not found with ID : " + id));
 
         doctorRepository.delete(doctor);
+    }
+    
+    @Override
+    public List<Doctor> getAllDoctorsSorted(){
+        return doctorRepository.findAll(
+            Sort.by("doctorName")
+        );
+    }
+    
+    @Override
+    public List<Doctor> findBySpecialization( String specialization){    	
+    	return doctorRepository.findBySpecialization( specialization);
     }
 
 }

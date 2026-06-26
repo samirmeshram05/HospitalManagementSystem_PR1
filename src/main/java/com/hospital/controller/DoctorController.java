@@ -59,5 +59,15 @@ public class DoctorController {
         return "Doctor Deleted Successfully";
 
     }
+    
+    @GetMapping("/sorted")
+    public List<Doctor> getDoctorsSorted(){
+        return doctorService.getAllDoctorsSorted();
+    }
+    
+    @GetMapping("/specialization/{specialization}")
+    public List<Doctor> findDoctor(@PathVariable String specialization){
+    	return doctorService.findBySpecialization( specialization);
+    }
 
 }

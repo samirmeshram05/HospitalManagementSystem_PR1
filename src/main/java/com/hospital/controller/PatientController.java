@@ -1,8 +1,7 @@
 package com.hospital.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import com.hospital.entity.Patient;
@@ -25,12 +24,11 @@ public class PatientController {
 
     }
 
-    // Get All Patients
     @GetMapping
-    public List<Patient> getAllPatients() {
-
-        return patientService.getAllPatients();
-
+    public Page<Patient> getAllPatients(
+    @RequestParam(defaultValue="0") int page,
+    @RequestParam(defaultValue="5") int size){
+        return patientService.getAllPatients(page,size);
     }
 
     // Get Patient By Id
