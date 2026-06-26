@@ -2,17 +2,17 @@ package com.hospital.service;
 
 import java.util.List;
 
-import com.hospital.entity.Department;
+import com.hospital.dto.DepartmentDTO;
 
 public interface DepartmentService {
 
-    Department saveDepartment(Department department);
+    DepartmentDTO saveDepartment(DepartmentDTO departmentDTO);
 
-    List<Department> getAllDepartments();
+    List<DepartmentDTO> getAllDepartments();
 
-    Department getDepartmentById(Long id);
+    DepartmentDTO getDepartmentById(Long id);
 
-    Department updateDepartment(Long id, Department department);
+    DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO);
 
     void deleteDepartment(Long id);
 
