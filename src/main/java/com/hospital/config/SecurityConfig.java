@@ -1,17 +1,5 @@
 package com.hospital.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.hospital.jwt.JwtAuthenticationFilter;
-
 
 // ye package code ko bypass JWT ko karne ke liye banaya tha
 /*
@@ -35,48 +23,95 @@ public class SecurityConfig {
 }*/
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.hospital.jwt.JwtAuthenticationFilter;
+
 @Configuration
 public class SecurityConfig {
 
     @Autowired
-    private JwtAuthenticationFilter jwtFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
 
+                // Disable CSRF
                 .csrf(csrf -> csrf.disable())
 
-                .sessionManagement(session ->
+                // Stateless Session
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS))
-
+                // Authorization Rules
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Public APIs
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**")
+                        .permitAll()
 
-                        .anyRequest().authenticated())
+                        // Admin Only
+                        .requestMatchers("/api/departments/**")
+                        .hasRole("ADMIN")
+
+                        // Admin + Doctor
+                        .requestMatchers(
+                                "/api/doctors/**",
+                                "/api/prescriptions/**",
+                                "/api/medicines/**")
+                        .hasAnyRole("ADMIN", "DOCTOR")
+
+                        // Admin + Receptionist
+                        .requestMatchers(
+                                "/api/patients/**",
+                                "/api/bills/**")
+                        .hasAnyRole("ADMIN", "RECEPTIONIST")
+
+                        // Admin + Doctor + Receptionist
+                        .requestMatchers("/api/appointments/**")
+                        .hasAnyRole(
+                                "ADMIN",
+                                "DOCTOR",
+                                "RECEPTIONIST")
+
+                        // Everything else
+                        .anyRequest()
+                        .authenticated())
 
                 .httpBasic(Customizer.withDefaults());
 
-        http.addFilterBefore(jwtFilter,
+        // JWT Filter
+        http.addFilterBefore(
+                jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-
     }
 
     @Bean
-    AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config)
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration)
             throws Exception {
 
-        return config.getAuthenticationManager();
+        return configuration.getAuthenticationManager();
 
     }
 
 }
-
