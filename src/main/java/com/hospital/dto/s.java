@@ -1,5 +1,5 @@
 package com.hospital.dto;
 
-public class d {
+public class s {
 
 }

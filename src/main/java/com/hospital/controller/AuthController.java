@@ -6,7 +6,10 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.hospital.dto.LoginRequest;
+import com.hospital.dto.LoginResponse;
 import com.hospital.entity.User;
+import com.hospital.service.AuthenticationService;
 import com.hospital.service.UserService;
 
 @RestController
@@ -16,19 +19,29 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+    
     // Register User
     @PostMapping("/register")
     public User registerUser(@RequestBody User user) {
         return userService.registerUser(user);
     }
 
-    // Temporary Login
+   /* // Temporary Login
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody User user) {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Login Successful");
         response.put("email", user.getEmail());
         return response;
+
+    }*/
+    
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+
+        return authenticationService.login(request);
 
     }
 
