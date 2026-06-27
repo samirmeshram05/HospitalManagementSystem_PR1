@@ -1,5 +1,6 @@
 package com.hospital.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByMobile(String mobile);
+
+    List<Patient> findByPatientNameContainingIgnoreCase(String patientName);
 
 }

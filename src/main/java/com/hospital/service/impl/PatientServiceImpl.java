@@ -3,8 +3,7 @@ package com.hospital.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import com.hospital.entity.Doctor;
@@ -17,82 +16,88 @@ import com.hospital.service.PatientService;
 @Service
 public class PatientServiceImpl implements PatientService {
 
-    @Autowired
-    private PatientRepository patientRepository;
+	@Autowired
+	private PatientRepository patientRepository;
 
-    @Autowired
-    private DoctorRepository doctorRepository;
+	@Autowired
+	private DoctorRepository doctorRepository;
 
-    @Override
-    public Patient savePatient(Patient patient) {
+	@Override
+	public Patient savePatient(Patient patient) {
 
-        if (patientRepository.existsByEmail(patient.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
+		if (patientRepository.existsByEmail(patient.getEmail())) {
+			throw new RuntimeException("Email already exists");
+		}
 
-        if (patientRepository.existsByMobile(patient.getMobile())) {
-            throw new RuntimeException("Mobile Number already exists");
-        }
+		if (patientRepository.existsByMobile(patient.getMobile())) {
+			throw new RuntimeException("Mobile Number already exists");
+		}
 
-        Long doctorId = patient.getDoctor().getDoctorId();
+		Long doctorId = patient.getDoctor().getDoctorId();
 
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
+		Doctor doctor = doctorRepository.findById(doctorId)
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
 
-        patient.setDoctor(doctor);
+		patient.setDoctor(doctor);
 
-        return patientRepository.save(patient);
-    }
+		return patientRepository.save(patient);
+	}
 
-    @Override
-    public Page<Patient> getAllPatients(int page,int size){
+	@Override
+	public Page<Patient> getAllPatients(int page, int size, String sortBy, String direction) {
 
-        return patientRepository.findAll(PageRequest.of(page,size));
+		Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-    }
+		Pageable pageable = PageRequest.of(page, size, sort);
 
-    @Override
-    public Patient getPatientById(Long id) {
+		return patientRepository.findAll(pageable);
+	}
 
-        return patientRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Patient not found with ID : " + id));
-    }
+	@Override
+	public Patient getPatientById(Long id) {
 
-    @Override
-    public Patient updatePatient(Long id, Patient patient) {
+		return patientRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID : " + id));
+	}
 
-        Patient existingPatient = patientRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Patient not found with ID : " + id));
+	@Override
+	public Patient updatePatient(Long id, Patient patient) {
 
-        existingPatient.setPatientName(patient.getPatientName());
-        existingPatient.setAge(patient.getAge());
-        existingPatient.setGender(patient.getGender());
-        existingPatient.setMobile(patient.getMobile());
-        existingPatient.setEmail(patient.getEmail());
-        existingPatient.setAddress(patient.getAddress());
-        existingPatient.setBloodGroup(patient.getBloodGroup());
+		Patient existingPatient = patientRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID : " + id));
 
-        Long doctorId = patient.getDoctor().getDoctorId();
+		existingPatient.setPatientName(patient.getPatientName());
+		existingPatient.setAge(patient.getAge());
+		existingPatient.setGender(patient.getGender());
+		existingPatient.setMobile(patient.getMobile());
+		existingPatient.setEmail(patient.getEmail());
+		existingPatient.setAddress(patient.getAddress());
+		existingPatient.setBloodGroup(patient.getBloodGroup());
 
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
+		Long doctorId = patient.getDoctor().getDoctorId();
 
-        existingPatient.setDoctor(doctor);
+		Doctor doctor = doctorRepository.findById(doctorId)
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
 
-        return patientRepository.save(existingPatient);
-    }
+		existingPatient.setDoctor(doctor);
 
-    @Override
-    public void deletePatient(Long id) {
+		return patientRepository.save(existingPatient);
+	}
 
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Patient not found with ID : " + id));
+	@Override
+	public void deletePatient(Long id) {
 
-        patientRepository.delete(patient);
-    }
+		Patient patient = patientRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID : " + id));
+
+		patientRepository.delete(patient);
+	}
+
+	@Override
+	public List<Patient> searchPatientByName(String patientName) {
+
+		return patientRepository.findByPatientNameContainingIgnoreCase(patientName);
+
+	}
+
 }
