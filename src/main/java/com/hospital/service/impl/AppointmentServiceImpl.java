@@ -1,11 +1,13 @@
 package com.hospital.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hospital.entity.Appointment;
+import com.hospital.entity.AppointmentStatus;
 import com.hospital.entity.Doctor;
 import com.hospital.entity.Patient;
 import com.hospital.exception.ResourceNotFoundException;
@@ -17,87 +19,114 @@ import com.hospital.service.AppointmentService;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+	@Autowired
+	private AppointmentRepository appointmentRepository;
 
-    @Autowired
-    private PatientRepository patientRepository;
+	@Autowired
+	private PatientRepository patientRepository;
 
-    @Autowired
-    private DoctorRepository doctorRepository;
+	@Autowired
+	private DoctorRepository doctorRepository;
 
-    @Override
-    public Appointment bookAppointment(Appointment appointment) {
+	@Override
+	public Appointment bookAppointment(Appointment appointment) {
 
-        Long patientId = appointment.getPatient().getPatientId();
+		Long patientId = appointment.getPatient().getPatientId();
 
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Patient not found with ID : " + patientId));
+		Patient patient = patientRepository.findById(patientId)
+				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID : " + patientId));
 
-        Long doctorId = appointment.getDoctor().getDoctorId();
+		Long doctorId = appointment.getDoctor().getDoctorId();
 
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
+		Doctor doctor = doctorRepository.findById(doctorId)
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
 
-        appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
+		appointment.setPatient(patient);
+		appointment.setDoctor(doctor);
 
-        return appointmentRepository.save(appointment);
-    }
+		return appointmentRepository.save(appointment);
+	}
 
-    @Override
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
-    }
+	@Override
+	public List<Appointment> getAllAppointments() {
+		return appointmentRepository.findAll();
+	}
 
-    @Override
-    public Appointment getAppointmentById(Long id) {
+	@Override
+	public Appointment getAppointmentById(Long id) {
 
-        return appointmentRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Appointment not found with ID : " + id));
-    }
+		return appointmentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID : " + id));
+	}
 
-    @Override
-    public Appointment updateAppointment(Long id, Appointment appointment) {
+	@Override
+	public Appointment updateAppointment(Long id, Appointment appointment) {
 
-        Appointment existingAppointment = appointmentRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Appointment not found with ID : " + id));
+		Appointment existingAppointment = appointmentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID : " + id));
 
-        existingAppointment.setAppointmentDate(appointment.getAppointmentDate());
-        existingAppointment.setAppointmentTime(appointment.getAppointmentTime());
-        existingAppointment.setSymptoms(appointment.getSymptoms());
-        existingAppointment.setStatus(appointment.getStatus());
+		existingAppointment.setAppointmentDate(appointment.getAppointmentDate());
+		existingAppointment.setAppointmentTime(appointment.getAppointmentTime());
+		existingAppointment.setSymptoms(appointment.getSymptoms());
+		existingAppointment.setAppointmentStatus(appointment.getAppointmentStatus());
 
-        Long patientId = appointment.getPatient().getPatientId();
+		Long patientId = appointment.getPatient().getPatientId();
 
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Patient not found with ID : " + patientId));
+		Patient patient = patientRepository.findById(patientId)
+				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID : " + patientId));
 
-        Long doctorId = appointment.getDoctor().getDoctorId();
+		Long doctorId = appointment.getDoctor().getDoctorId();
 
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
+		Doctor doctor = doctorRepository.findById(doctorId)
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID : " + doctorId));
 
-        existingAppointment.setPatient(patient);
-        existingAppointment.setDoctor(doctor);
+		existingAppointment.setPatient(patient);
+		existingAppointment.setDoctor(doctor);
 
-        return appointmentRepository.save(existingAppointment);
-    }
+		return appointmentRepository.save(existingAppointment);
+	}
 
-    @Override
-    public void deleteAppointment(Long id) {
+	@Override
+	public void deleteAppointment(Long id) {
 
-        Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Appointment not found with ID : " + id));
+		Appointment appointment = appointmentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID : " + id));
 
-        appointmentRepository.delete(appointment);
-    }
+		appointmentRepository.delete(appointment);
+	}
 
+	/*@Override
+	public List<Appointment> searchByStatus(AppointmentStatus status) {
+
+		return appointmentRepository.findByAppointmentStatus(status);
+
+	}
+	*/
+	@Override
+	public List<Appointment> searchByStatus(AppointmentStatus appointmentStatus) {
+
+	    return appointmentRepository.findByAppointmentStatus(appointmentStatus);
+
+	}
+
+	@Override
+	public List<Appointment> searchByDate(LocalDate appointmentDate) {
+
+		return appointmentRepository.findByAppointmentDate(appointmentDate);
+
+	}
+
+	@Override
+	public List<Appointment> searchByDoctor(String doctorName) {
+
+		return appointmentRepository.findByDoctorDoctorNameContainingIgnoreCase(doctorName);
+
+	}
+
+	@Override
+	public List<Appointment> searchByPatient(String patientName) {
+
+		return appointmentRepository.findByPatientPatientNameContainingIgnoreCase(patientName);
+
+	}
 }

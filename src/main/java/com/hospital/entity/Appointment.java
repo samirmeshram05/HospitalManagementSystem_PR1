@@ -29,8 +29,10 @@ public class Appointment {
     @Size(min = 10, max = 500)
     private String symptoms;
 
-    @NotBlank(message = "Status is required")
-    private String status;
+    @NotNull(message = "Appointment Status is required")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AppointmentStatus appointmentStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id")
@@ -43,15 +45,19 @@ public class Appointment {
     public Appointment() {
     }
 
-    public Appointment(Long appointmentId, LocalDate appointmentDate,
-            LocalTime appointmentTime, String symptoms,
-            String status, Patient patient, Doctor doctor) {
+    public Appointment(Long appointmentId,
+            LocalDate appointmentDate,
+            LocalTime appointmentTime,
+            String symptoms,
+            AppointmentStatus appointmentStatus,
+            Patient patient,
+            Doctor doctor) {
 
         this.appointmentId = appointmentId;
         this.appointmentDate = appointmentDate;
         this.appointmentTime = appointmentTime;
         this.symptoms = symptoms;
-        this.status = status;
+        this.appointmentStatus = appointmentStatus;
         this.patient = patient;
         this.doctor = doctor;
     }
@@ -88,12 +94,12 @@ public class Appointment {
         this.symptoms = symptoms;
     }
 
-    public String getStatus() {
-        return status;
+    public AppointmentStatus getAppointmentStatus() {
+        return appointmentStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setAppointmentStatus(AppointmentStatus appointmentStatus) {
+        this.appointmentStatus = appointmentStatus;
     }
 
     public Patient getPatient() {
