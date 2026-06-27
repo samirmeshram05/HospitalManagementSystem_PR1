@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.hospital.dto.DepartmentDTO;
-import com.hospital.entity.Department;
 import com.hospital.service.DepartmentService;
+import com.hospital.util.ApiResponse;
 
 import jakarta.validation.Valid;
 
@@ -28,29 +28,65 @@ public class DepartmentController {
 	 */
 
 	@PostMapping
-	public DepartmentDTO saveDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) {
-		return departmentService.saveDepartment(departmentDTO);
+	public ApiResponse<DepartmentDTO> saveDepartment(@Valid @RequestBody DepartmentDTO dto) {
+		DepartmentDTO savedDepartment = departmentService.saveDepartment(dto);
+		return new ApiResponse<>(true, "Department Saved Successfully", savedDepartment);
+
 	}
 
+	/*
+	 * @GetMapping public List<DepartmentDTO> getAllDepartments() { return
+	 * departmentService.getAllDepartments(); }
+	 */
 	@GetMapping
-	public List<DepartmentDTO> getAllDepartments() {
-		return departmentService.getAllDepartments();
+	public ApiResponse<List<DepartmentDTO>> getAllDepartments() {
+		return new ApiResponse<>(true, "Department List", departmentService.getAllDepartments());
+
 	}
+
+	/*
+	 * @GetMapping("/{id}") public DepartmentDTO getDepartmentById(@PathVariable
+	 * Long id) { return departmentService.getDepartmentById(id); }
+	 */
 
 	@GetMapping("/{id}")
-	public DepartmentDTO getDepartmentById(@PathVariable Long id) {
-		return departmentService.getDepartmentById(id);
+	public ApiResponse<DepartmentDTO> getDepartmentById(@PathVariable Long id) {
+		return new ApiResponse<>(
+				true,
+				"Department Found",
+				departmentService.getDepartmentById(id));
 	}
+
+	/*
+	 * @PutMapping("/{id}") public DepartmentDTO updateDepartment(@PathVariable Long
+	 * id, @Valid @RequestBody DepartmentDTO dto) { return
+	 * departmentService.updateDepartment(id, dto); }
+	 */
 
 	@PutMapping("/{id}")
-	public DepartmentDTO updateDepartment( @PathVariable Long id, @Valid @RequestBody DepartmentDTO dto) {
-		return departmentService.updateDepartment(id, dto);
+	public ApiResponse<DepartmentDTO> updateDepartment(
+			@PathVariable Long id,
+			@RequestBody DepartmentDTO dto) {
+		return new ApiResponse<>(
+				true,
+				"Department Updated Successfully",
+				departmentService.updateDepartment(id, dto));
 	}
 
+	/*
+	 * @DeleteMapping("/{id}") public String deleteDepartment(@PathVariable Long id)
+	 * { departmentService.deleteDepartment(id); return
+	 * "Department Deleted Successfully"; }
+	 * 
+	 */
+
 	@DeleteMapping("/{id}")
-	public String deleteDepartment(@PathVariable Long id) {
+	public ApiResponse<String> deleteDepartment(@PathVariable Long id) {
 		departmentService.deleteDepartment(id);
-		return "Department Deleted Successfully";
+		return new ApiResponse<>(
+				true,
+				"Department Deleted Successfully",
+				null);
 	}
 
 }

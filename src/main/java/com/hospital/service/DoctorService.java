@@ -2,22 +2,23 @@ package com.hospital.service;
 
 import java.util.List;
 
+import com.hospital.dto.DoctorDTO;
 import com.hospital.entity.Doctor;
 
 public interface DoctorService {
 
-    Doctor saveDoctor(Doctor doctor);
+	DoctorDTO saveDoctor(DoctorDTO doctorDTO);
 
-    List<Doctor> getAllDoctors();
+	List<DoctorDTO> getAllDoctors();
 
-    Doctor getDoctorById(Long id);
+	DoctorDTO getDoctorById(Long id);
 
-    Doctor updateDoctor(Long id, Doctor doctor);
+	DoctorDTO updateDoctor(Long id, DoctorDTO doctorDTO);
 
-    List<Doctor> getAllDoctorsSorted();
-    
-    void deleteDoctor(Long id);
-    
-    List<Doctor> findBySpecialization( String specialization );
+	List<Doctor> getAllDoctorsSorted();
+
+	void deleteDoctor(Long id);
+
+	List<Doctor> findBySpecialization(String specialization);
 
 }
