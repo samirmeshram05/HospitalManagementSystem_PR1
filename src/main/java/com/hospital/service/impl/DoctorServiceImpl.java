@@ -18,164 +18,161 @@ import com.hospital.service.DoctorService;
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
-    @Autowired
-    private DoctorRepository doctorRepository;
-    
-    @Autowired
-    private ModelMapper modelMapper;
+	@Autowired
+	private DoctorRepository doctorRepository;
 
-    @Autowired
-    private DepartmentRepository departmentRepository;
+	@Autowired
+	private ModelMapper modelMapper;
 
-   /* @Override
-    public Doctor saveDoctor(Doctor doctor) {
+	@Autowired
+	private DepartmentRepository departmentRepository;
 
-        if (doctorRepository.existsByEmail(doctor.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
+	/*
+	 * @Override public Doctor saveDoctor(Doctor doctor) {
+	 * 
+	 * if (doctorRepository.existsByEmail(doctor.getEmail())) { throw new
+	 * RuntimeException("Email already exists"); }
+	 * 
+	 * if (doctorRepository.existsByMobile(doctor.getMobile())) { throw new
+	 * RuntimeException("Mobile Number already exists"); }
+	 * 
+	 * Long departmentId = doctor.getDepartment().getDepartmentId();
+	 * 
+	 * Department department = departmentRepository.findById(departmentId)
+	 * .orElseThrow(() -> new
+	 * ResourceNotFoundException("Department not found with ID : " + departmentId));
+	 * 
+	 * doctor.setDepartment(department);
+	 * 
+	 * return doctorRepository.save(doctor); }
+	 */
 
-        if (doctorRepository.existsByMobile(doctor.getMobile())) {
-            throw new RuntimeException("Mobile Number already exists");
-        }
+	@Override
+	public DoctorDTO saveDoctor(DoctorDTO dto) {
 
-        Long departmentId = doctor.getDepartment().getDepartmentId();
+		Department department = departmentRepository.findById(dto.getDepartmentId())
+				.orElseThrow(() -> new ResourceNotFoundException("Department not found"));
 
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Department not found with ID : " + departmentId));
+		Doctor doctor = modelMapper.map(dto, Doctor.class);
 
-        doctor.setDepartment(department);
+		doctor.setDepartment(department);
 
-        return doctorRepository.save(doctor);
-    }*/
-    
-    @Override
-    public DoctorDTO saveDoctor(DoctorDTO dto) {
+		Doctor savedDoctor = doctorRepository.save(doctor);
 
-        Department department = departmentRepository
-                .findById(dto.getDepartmentId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Department not found"));
+		DoctorDTO response = modelMapper.map(savedDoctor, DoctorDTO.class);
 
-        Doctor doctor = modelMapper.map(dto, Doctor.class);
+		response.setDepartmentId(department.getDepartmentId());
+		response.setDepartmentName(department.getDepartmentName());
 
-        doctor.setDepartment(department);
+		return response;
+	}
 
-        Doctor savedDoctor = doctorRepository.save(doctor);
+	@Override
+	public List<DoctorDTO> getAllDoctors() {
 
-        DoctorDTO response = modelMapper.map(savedDoctor, DoctorDTO.class);
+		return doctorRepository.findAll()
 
-        response.setDepartmentId(department.getDepartmentId());
-        response.setDepartmentName(department.getDepartmentName());
+				.stream()
 
-        return response;
-    }
+				.map(doctor -> {
 
-    @Override
-    public List<DoctorDTO> getAllDoctors() {
+					DoctorDTO dto = modelMapper.map(doctor, DoctorDTO.class);
 
-        return doctorRepository.findAll()
+					dto.setDepartmentId(doctor.getDepartment().getDepartmentId());
 
-                .stream()
+					dto.setDepartmentName(doctor.getDepartment().getDepartmentName());
 
-                .map(doctor -> {
+					return dto;
 
-                    DoctorDTO dto =
-                            modelMapper.map(doctor, DoctorDTO.class);
+				})
 
-                    dto.setDepartmentId(
-                            doctor.getDepartment().getDepartmentId());
+				.toList();
 
-                    dto.setDepartmentName(
-                            doctor.getDepartment().getDepartmentName());
+	}
 
-                    return dto;
+	@Override
+	public DoctorDTO getDoctorById(Long id) {
 
-                })
+		Doctor doctor = doctorRepository.findById(id)
 
-                .toList();
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
 
-    }
+		DoctorDTO dto = modelMapper.map(doctor, DoctorDTO.class);
 
-    @Override
-    public DoctorDTO getDoctorById(Long id) {
+		dto.setDepartmentId(doctor.getDepartment().getDepartmentId());
 
-        Doctor doctor = doctorRepository.findById(id)
+		dto.setDepartmentName(doctor.getDepartment().getDepartmentName());
 
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Doctor not found"));
+		return dto;
 
-        DoctorDTO dto = modelMapper.map(doctor, DoctorDTO.class);
+	}
 
-        dto.setDepartmentId(
-                doctor.getDepartment().getDepartmentId());
+	@Override
+	public DoctorDTO updateDoctor(Long id, DoctorDTO dto) {
 
-        dto.setDepartmentName(
-                doctor.getDepartment().getDepartmentName());
+		Doctor doctor = doctorRepository.findById(id)
 
-        return dto;
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
 
-    }
+		Department department = departmentRepository.findById(dto.getDepartmentId())
+				.orElseThrow(() -> new ResourceNotFoundException("Department not found"));
 
-    @Override
-    public DoctorDTO updateDoctor(Long id,
-            DoctorDTO dto) {
+		doctor.setDoctorName(dto.getDoctorName());
+		doctor.setSpecialization(dto.getSpecialization());
+		doctor.setQualification(dto.getQualification());
+		doctor.setExperience(dto.getExperience());
+		doctor.setEmail(dto.getEmail());
+		doctor.setMobile(dto.getMobile());
+		doctor.setDepartment(department);
 
-        Doctor doctor = doctorRepository.findById(id)
+		Doctor updatedDoctor = doctorRepository.save(doctor);
 
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Doctor not found"));
+		DoctorDTO response = modelMapper.map(updatedDoctor, DoctorDTO.class);
 
-        Department department = departmentRepository
-                .findById(dto.getDepartmentId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Department not found"));
+		response.setDepartmentId(department.getDepartmentId());
+		response.setDepartmentName(department.getDepartmentName());
 
-        doctor.setDoctorName(dto.getDoctorName());
-        doctor.setSpecialization(dto.getSpecialization());
-        doctor.setQualification(dto.getQualification());
-        doctor.setExperience(dto.getExperience());
-        doctor.setEmail(dto.getEmail());
-        doctor.setMobile(dto.getMobile());
-        doctor.setDepartment(department);
+		return response;
 
-        Doctor updatedDoctor =
-                doctorRepository.save(doctor);
+	}
 
-        DoctorDTO response =
-                modelMapper.map(updatedDoctor, DoctorDTO.class);
+	@Override
+	public void deleteDoctor(Long id) {
 
-        response.setDepartmentId(department.getDepartmentId());
-        response.setDepartmentName(department.getDepartmentName());
+		Doctor doctor = doctorRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID : " + id));
 
-        return response;
+		doctorRepository.delete(doctor);
+	}
 
-    }
+	@Override
+	public List<Doctor> getAllDoctorsSorted() {
+		return doctorRepository.findAll(Sort.by("doctorName"));
+	}
 
-    @Override
-    public void deleteDoctor(Long id) {
+	@Override
+	public List<Doctor> findBySpecialization(String specialization) {
+		return doctorRepository.findBySpecialization(specialization);
+	}
 
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Doctor not found with ID : " + id));
+	@Override
+	public List<Doctor> searchDoctorByName(String doctorName) {
 
-        doctorRepository.delete(doctor);
-    }
-    
-    @Override
-    public List<Doctor> getAllDoctorsSorted(){
-        return doctorRepository.findAll(
-            Sort.by("doctorName")
-        );
-    }
-    
-    @Override
-    public List<Doctor> findBySpecialization( String specialization){    	
-    	return doctorRepository.findBySpecialization( specialization);
-    }
+		return doctorRepository.findByDoctorNameContainingIgnoreCase(doctorName);
 
+	}
+
+	@Override
+	public List<Doctor> searchDoctorBySpecialization(String specialization) {
+
+		return doctorRepository.findBySpecializationContainingIgnoreCase(specialization);
+
+	}
+
+	@Override
+	public List<Doctor> searchDoctorByDepartment(String departmentName) {
+
+		return doctorRepository.findByDepartmentDepartmentNameContainingIgnoreCase(departmentName);
+
+	}
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.hospital.dto.DoctorDTO;
 import com.hospital.entity.Doctor;
 import com.hospital.service.DoctorService;
+import com.hospital.util.ApiResponse;
 
 import jakarta.validation.Valid;
 
@@ -72,6 +73,50 @@ public class DoctorController {
 	@GetMapping("/specialization/{specialization}")
 	public List<Doctor> findDoctor(@PathVariable String specialization) {
 		return doctorService.findBySpecialization(specialization);
+	}
+	@GetMapping("/search/name")
+	public ApiResponse<List<Doctor>> searchDoctorByName(
+
+	        @RequestParam String doctorName) {
+
+	    return new ApiResponse<>(
+
+	            true,
+
+	            "Doctor Search Result",
+
+	            doctorService.searchDoctorByName(doctorName));
+
+	}
+	
+	@GetMapping("/search/specialization")
+	public ApiResponse<List<Doctor>> searchDoctorBySpecialization(
+
+	        @RequestParam String specialization) {
+
+	    return new ApiResponse<>(
+
+	            true,
+
+	            "Doctor Search Result",
+
+	            doctorService.searchDoctorBySpecialization(specialization));
+
+	}
+	
+	@GetMapping("/search/department")
+	public ApiResponse<List<Doctor>> searchDoctorByDepartment(
+
+	        @RequestParam String departmentName) {
+
+	    return new ApiResponse<>(
+
+	            true,
+
+	            "Doctor Search Result",
+
+	            doctorService.searchDoctorByDepartment(departmentName));
+
 	}
 
 }

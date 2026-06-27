@@ -21,4 +21,9 @@ public interface DoctorService {
 
 	List<Doctor> findBySpecialization(String specialization);
 
+	List<Doctor> searchDoctorByName(String doctorName);
+
+	List<Doctor> searchDoctorByDepartment(String departmentName);
+
+	List<Doctor> searchDoctorBySpecialization(String specialization);
 }
