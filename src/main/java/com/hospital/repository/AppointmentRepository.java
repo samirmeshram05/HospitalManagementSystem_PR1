@@ -18,4 +18,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByPatientPatientNameContainingIgnoreCase(String patientName);
 
+    long countByAppointmentStatus(AppointmentStatus appointmentStatus);
 }
